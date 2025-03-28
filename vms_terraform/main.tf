@@ -10,17 +10,18 @@ terraform {
 
 resource "digitalocean_droplet" "vm01" {
   image    = "ubuntu-22-04-x64"
-  name     = var.droplet_name
+  name     = "${var.droplet_name}-${count.index}"
   region   = var.droplet_region
   size     = var.droplet_size
   ssh_keys = [data.digitalocean_ssh_key.ssh_key.id]
+  count = var.vm_count
 }
 
 
 resource "digitalocean_firewall" "vm01_firewall" {
   name = "vm01-firewall"
 
-  droplet_ids = [digitalocean_droplet.vm01.id]
+  droplet_ids = digitalocean_droplet.vm01[*].id
 
   inbound_rule {
     protocol         = "tcp"
